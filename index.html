@@ -1,1 +1,753 @@
-<!-- sdgds map -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <title>Service Area Map</title>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="initial-scale=1,width=device-width,viewport-fit=cover" />
+
+    <!-- Import MapLibre GL JS -->
+    <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@4.3.2/dist/maplibre-gl.css' />
+    <script src='https://unpkg.com/maplibre-gl@4.3.2/dist/maplibre-gl.js'></script>
+
+    <!-- Import MapTiler Geocoding Control -->
+    <script src="https://unpkg.com/@maptiler/geocoding-control@latest/maplibregl.umd.js"></script>
+    <link href="https://unpkg.com/@maptiler/geocoding-control@latest/style.css" rel="stylesheet" />
+
+    <!-- Import Turf.js -->
+    <script src="https://unpkg.com/@turf/turf@latest"></script>
+
+    <!-- Import fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+
+    <style>
+
+        /* Page setup */
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            --font: 'Lexend', sans-serif;
+            font-family: var(--font);
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        /* Pointer event management */
+
+        #map {
+            pointer-events: none;
+        }
+
+        .speech-bubble {
+            pointer-events: auto;
+        }
+
+
+
+        /* Map attribution */
+
+        .maplibregl-ctrl-attrib.maplibregl-compact {
+            margin: 32px;
+        }
+
+        /* Geocoding control */
+
+        .maplibregl-ctrl-top-left .maplibregl-ctrl {
+            margin: 32px;
+        }
+
+        .maplibregl-ctrl-geocoder form {
+            font-family: var(--font) !important;
+            border-radius: 12px !important;
+            width: 300px !important;
+            min-width: 300px !important;
+            max-width: 300px !important;
+        }
+
+        .maplibregl-ctrl-geocoder form div {
+            padding: 8px;
+            border-radius: 16px !important;
+        }
+
+        .maplibregl-ctrl-geocoder form div input{
+            font-size: 14px !important;
+            text-overflow: ellipsis;
+        }
+
+        
+        @media screen and (max-width: 480px) {
+            /* 16px on mobile to prevent auto zooming */
+            .maplibregl-ctrl-geocoder form div input{
+                font-size: 16px !important;
+            }
+
+
+            
+            /* Geocoder positioning for mobile */
+
+            .maplibregl-ctrl-attrib.maplibregl-compact {
+                margin: 24px;
+            }
+
+            .maplibregl-ctrl-top-left .maplibregl-ctrl {
+                margin: 24px;
+            }
+
+            .maplibregl-ctrl-geocoder form {
+                font-family: var(--font) !important;
+                border-radius: 12px !important;
+                width: calc(100vw - 48px) !important;
+                min-width: calc(100vw - 48px) !important;
+                max-width: calc(100vw - 48px) !important;
+            }
+        }
+
+        .maplibregl-ctrl-geocoder form div div.clear-button-container, .maplibregl-ctrl-geocoder form div div.clear-button-container button{
+            cursor: pointer !important;
+        }
+
+        .maplibregl-ctrl-geocoder form div button.search-button {
+            padding-left: 4px;
+        }
+
+        .maplibregl-ctrl-geocoder form ul {
+            border-radius: 16px !important;
+        }
+
+        .maplibregl-ctrl-geocoder form ul li {
+            cursor: pointer !important;
+            animation: none !important;
+            padding-left: 12px !important;
+            padding-right: 12px !important;
+        }
+
+        .maplibregl-ctrl-geocoder form ul li img{
+            display: none !important;
+        }
+
+        .maplibregl-ctrl-geocoder form div.no-results {
+            display: none !important;
+        }
+
+
+
+        /* Speech bubble */
+
+        .speech-bubble {
+            position: relative;
+            background: #FFFFFF;
+            color: #000000;
+            width: 300px;
+            padding: 16px;
+            border-radius: 16px;
+            margin: 50px;
+            font-family: var(--font) !important;
+            font-size: 14px;
+            transform: translateY(-50%);
+            transform-origin: (bottom, center);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 2px 5px #33335926;
+            animation: fadeIn .3s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            0%   { opacity: 0.6; transform: scale(.5) translateY(-48%);}
+            100% { opacity: 1; transform: scale(1) translateY(-50%);}
+        }
+          
+        .speech-bubble::after {
+            content: "";
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%); 
+            border: 10px solid transparent;
+            border-top-color: #FFFFFF;
+        }
+
+        .speech-bubble-icon {
+            height: 64px;
+            width: 64px;
+            margin-bottom: 12px;
+        }
+
+        .speech-bubble-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .speech-bubble-message {
+            color: #79797f;
+            margin-bottom: 12px;
+            font-weight: 300;
+        }
+
+        .speech-bubble-cta {
+            font-family: var(--font) !important;
+            background: rgb(37, 37, 37);
+            color: #FFFFFF;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 12px 24px;
+            margin-top: 6px;
+            margin-bottom: 6px;
+            border: 3px solid rgb(37, 37, 37);
+            border-radius: 16px;
+            cursor: pointer;
+            box-shadow: 0 0 6px 0px #33335900;
+            transition: box-shadow .1s ease-in-out;
+        }
+
+        .speech-bubble-cta:hover {
+            border: 3px solid rgb(255, 255, 255);
+            box-shadow: 0 0 6px 0px #33335955;
+        }
+
+        .speech-bubble-cta:active {
+            transform: scale(.98);
+        }
+
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+
+        // Global variables
+        const API_KEY = 'TNtWDlBtkWMHsFhPqwDR';
+        const style = 'https://api.maptiler.com/maps/streets-v2/style.json';
+        const center = [-111.79, 33.425];
+        const color = {
+            red: '#ff3b30',
+            orange: '#ff9500',
+            yellow: '#ffcc00',
+            green: '#34c759',
+            blue: '#208cf5'
+        };
+        const getServiceTarget = 'https://samedaygaragedoorservices.com/get-service';
+
+
+        // Map initializer
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: style + '?key=' + API_KEY,
+            center: center,
+            zoom: 9.5,
+            interactive: false,
+        });
+
+
+        // Collapse the attribution control on load
+        document.querySelector('.maplibregl-ctrl-attrib').classList.remove('maplibregl-compact-show');
+
+
+        map.on('load', function() {
+            
+
+            map.addSource('serviceArea', {
+                'type': 'geojson',
+                'data': {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Polygon',
+                        'coordinates': [
+                        [
+                          [
+                            -112.40370590948893,
+                            33.7431871957082
+                          ],
+                          [
+                            -112.49158057279631,
+                            33.6699399320877
+                          ],
+                          [
+                            -112.54466877532782,
+                            33.61549964159403
+                          ],
+                          [
+                            -112.58572198633023,
+                            33.56704184876229
+                          ],
+                          [
+                            -112.6287062119065,
+                            33.49509353649721
+                          ],
+                          [
+                            -112.64882002879735,
+                            33.45667354402134
+                          ],
+                          [
+                            -112.65610812564694,
+                            33.43348523201533
+                          ],
+                          [
+                            -112.6600531347413,
+                            33.409174463103085
+                          ],
+                          [
+                            -112.65748593154548,
+                            33.388825985994686
+                          ],
+                          [
+                            -112.65291287569838,
+                            33.372939758066536
+                          ],
+                          [
+                            -112.6424994293922,
+                            33.35673116424762
+                          ],
+                          [
+                            -112.62941151288378,
+                            33.34387092029327
+                          ],
+                          [
+                            -112.61201936749349,
+                            33.33268602652943
+                          ],
+                          [
+                            -112.59328998700032,
+                            33.324293121853756
+                          ],
+                          [
+                            -112.55239236948648,
+                            33.31293958818176
+                          ],
+                          [
+                            -112.48071648117005,
+                            33.30222116444273
+                          ],
+                          [
+                            -112.42276423132107,
+                            33.289590889176964
+                          ],
+                          [
+                            -112.37790411281011,
+                            33.27221416432242
+                          ],
+                          [
+                            -112.35667899530023,
+                            33.25666923760288
+                          ],
+                          [
+                            -112.3441297721763,
+                            33.2409726234592
+                          ],
+                          [
+                            -112.33828639570928,
+                            33.22317981435798
+                          ],
+                          [
+                            -112.33766131464888,
+                            33.20809753119336
+                          ],
+                          [
+                            -112.33913974393721,
+                            33.1911705747775
+                          ],
+                          [
+                            -112.34314293198395,
+                            33.1594962562738
+                          ],
+                          [
+                            -112.34956767500952,
+                            33.122740798330824
+                          ],
+                          [
+                            -112.35515249612268,
+                            33.0897694036958
+                          ],
+                          [
+                            -112.35704605015523,
+                            33.051373119170606
+                          ],
+                          [
+                            -112.3547288327128,
+                            33.02660802698735
+                          ],
+                          [
+                            -112.34852757269894,
+                            33.00617893006462
+                          ],
+                          [
+                            -112.33946872968303,
+                            32.982442780453454
+                          ],
+                          [
+                            -112.32652584409578,
+                            32.96195904915061
+                          ],
+                          [
+                            -112.27812954740854,
+                            32.9103823370167
+                          ],
+                          [
+                            -112.22202424337273,
+                            32.84151787417217
+                          ],
+                          [
+                            -112.18532829184828,
+                            32.81818490293915
+                          ],
+                          [
+                            -112.14920318884847,
+                            32.80942587603606
+                          ],
+                          [
+                            -112.06367007710794,
+                            32.80339878930373
+                          ],
+                          [
+                            -111.9557638698337,
+                            32.80019265682674
+                          ],
+                          [
+                            -111.71018583020606,
+                            32.8001188461965
+                          ],
+                          [
+                            -111.61326293887083,
+                            32.802208440279216
+                          ],
+                          [
+                            -111.54251428029798,
+                            32.81131399219511
+                          ],
+                          [
+                            -111.4801200024216,
+                            32.830306538937364
+                          ],
+                          [
+                            -111.41857359698314,
+                            32.862653033897544
+                          ],
+                          [
+                            -111.3647506500543,
+                            32.91080221406666
+                          ],
+                          [
+                            -111.3198647966374,
+                            32.97969840267841
+                          ],
+                          [
+                            -111.28718949843682,
+                            33.050092970196104
+                          ],
+                          [
+                            -111.25158219140437,
+                            33.136456949351185
+                          ],
+                          [
+                            -111.2369518066645,
+                            33.20346546435259
+                          ],
+                          [
+                            -111.2367810802284,
+                            33.28855401942204
+                          ],
+                          [
+                            -111.24752563102872,
+                            33.37652882710316
+                          ],
+                          [
+                            -111.27761037326945,
+                            33.47517015931794
+                          ],
+                          [
+                            -111.34852440855092,
+                            33.595181671274034
+                          ],
+                          [
+                            -111.44291221182588,
+                            33.69160047131423
+                          ],
+                          [
+                            -111.4902852884814,
+                            33.74347924204503
+                          ],
+                          [
+                            -111.54192632295485,
+                            33.781137783271205
+                          ],
+                          [
+                            -111.63432945983693,
+                            33.84719814284968
+                          ],
+                          [
+                            -111.75251951863937,
+                            33.89002081796082
+                          ],
+                          [
+                            -111.87500739776185,
+                            33.90964069687783
+                          ],
+                          [
+                            -112.00179309720475,
+                            33.914990789366
+                          ],
+                          [
+                            -112.0673792255276,
+                            33.90924081213406
+                          ],
+                          [
+                            -112.12857879664729,
+                            33.898939504399294
+                          ],
+                          [
+                            -112.19519501160867,
+                            33.870396425082674
+                          ],
+                          [
+                            -112.31805998462676,
+                            33.806323738590194
+                          ],
+                          [
+                            -112.40370590948893,
+                            33.7431871957082
+                          ]
+                        ]
+                      ]
+                    }
+                }
+            });
+
+
+            // Service area fill layer
+            map.addLayer({
+                'id': 'serviceAreaFill',
+                'type': 'fill',
+                'source': 'serviceArea',
+                'layout': {},
+                'paint': {
+                    'fill-color': color.blue,
+                    'fill-opacity': 0.2
+                }
+            }, "Road labels"); // Render underneath map labels
+
+
+            // Service area outline layer
+            map.addLayer({
+                'id': 'serviceAreaOutline',
+                'type': 'line',
+                'source': 'serviceArea',
+                'layout': {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                'paint': {
+                    'line-color': color.blue,
+                    'line-width': 3,
+                    'line-dasharray': [1, 2]
+                }
+            }, "Road labels"); // Render underneath map labels
+
+
+            //Geocoder initializer
+            const gc = new maplibreglMaptilerGeocoder.GeocodingControl({
+                apiKey: API_KEY,
+                maplibregl,
+                country: 'us',
+                noResultsMessage: 'No results found.',
+                placeholder: `See if you're in our service area`,
+                types: ['address'],
+                proximity: [-111.79, 33.425],
+                zoom: 9.5,
+                showPlaceType: 'false',
+                showFullGeometry: false
+
+            });
+            map.addControl(gc, 'top-left');
+
+
+            // Geocoder reset button event listener (clear the map markers and reset the view)
+            const clearButton = document.querySelector('.clear-button-container button');
+            clearButton.addEventListener('click', function() {
+                const marker = document.querySelector('.maplibregl-marker');
+                if (marker) {
+                    marker.remove();
+                }
+                resetView();
+            });
+
+
+            // Geocoder pick event listener (custom flyTo and popup)
+            gc.on('pick', function (e) {
+                try {
+                    // Initialize variables
+                    const coords = e.feature.geometry.coordinates;
+                    const polygon = map.getSource('serviceArea')._data.geometry.coordinates[0];
+                    const point = turf.point(coords);
+                    const polygonFeature = turf.polygon([polygon]);
+                    const isInside = turf.booleanPointInPolygon(point, polygonFeature);
+                    const addressRaw = e.feature.place_name;
+                    const addressTrimmed = addressRaw.replace(', United States', '');
+                    const addressLine1 = addressTrimmed.split(',')[0];
+                    const addressLine2 = addressTrimmed.split(',').slice(1).join(',');
+
+                    // Manually recenter after geocoding picks a location (to account for popup size)
+                    map.flyTo({
+                        center: coords,
+                        zoom: 9.5,
+                        offset: [0, 120] 
+                    });
+            
+                    if (isInside) {
+                        // Within service area
+                        const marker = document.querySelector('.maplibregl-marker');
+                        const pin = marker.querySelector('svg');
+                        pin.remove();
+            
+                        const message = document.createElement('div');
+                        message.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${color.green}" class="speech-bubble-icon">
+                                <path d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 
+                                        10 10 10 10-4.48 10-10S17.52 2 
+                                        12 2zm-2 15-5-5 
+                                        1.41-1.41L10 14.17l7.59-7.59L19 
+                                        8l-9 9z"/>
+                            </svg>
+                            <span class="speech-bubble-title">You're in our service area</span>
+                            <span class="speech-bubble-message">${addressLine1}<br>${addressLine2}</span>
+                            <button class="speech-bubble-cta">Get Service Now</button>
+                        `;
+                        message.classList.add('speech-bubble');
+                        marker.appendChild(message);
+            
+                        const button = document.querySelector('.speech-bubble-cta');
+                        button.addEventListener('click', function() {
+                            window.top.location.href = getServiceTarget;
+                        });
+            
+                    } else {
+                        // Outside service area
+                        const marker = document.querySelector('.maplibregl-marker');
+                        const pin = marker.querySelector('svg');
+                        pin.remove();
+            
+                        const message = document.createElement('div');
+                        message.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" 
+                                 fill="${color.yellow}" class="speech-bubble-icon">
+                                <path d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M12 2C6.48 2 2 6.48 
+                                         2 12s4.48 10 10 10 10-4.48 
+                                         10-10S17.52 2 12 2zm1 
+                                         15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                            </svg>
+                            <span class="speech-bubble-title">
+                                You're outside our standard service area
+                            </span>
+                            <span class="speech-bubble-message">
+                                But we may still be able to help. 
+                                Please reach out below to inquire.
+                            </span>
+                            <button class="speech-bubble-cta">Contact Us</button>
+                        `;
+                        message.classList.add('speech-bubble');
+                        marker.appendChild(message);
+
+                        const button = document.querySelector('.speech-bubble-cta');
+                        button.addEventListener('click', function() {
+                            window.top.location.href = getServiceTarget;
+                        });
+                    }
+            
+                } catch (e) {
+                    console.log('Error:', e);
+                }
+            });
+
+
+            // Remove extraneous suggestions from the geocoder and clean up the address
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    const suggestions = document.querySelectorAll('.maplibregl-ctrl-geocoder form ul li');
+                    suggestions.forEach(function(suggestion) {
+                        if (suggestion.innerHTML.includes('street.svg')) {
+                            suggestion.remove();
+                        }
+                        suggestionLine2s = suggestion.querySelectorAll('span span.line2');
+                        suggestionLine2s.forEach(function(suggestionLine2) {
+                            if (suggestionLine2.innerHTML.includes('United States')) {
+                                suggestionLine2.innerHTML = suggestionLine2.innerHTML.replace(', United States', '');
+                            }
+                        });
+
+                    });
+
+                });
+            });
+            observer.observe(document, {
+                childList: true,
+                subtree: true
+            });
+
+
+            // Helper function to reset the map view to the service area
+            function resetView() {
+                const bounds = new maplibregl.LngLatBounds();
+                const coordinates = map.getSource('serviceArea')._data.geometry.coordinates[0];
+                coordinates.forEach(function (coordinate) {
+                    bounds.extend(coordinate);
+                });
+                map.fitBounds(bounds, {
+                    padding: 80
+                });
+            }
+            resetView();
+
+
+        });
+        
+
+    </script>
+</body>
+</html>
+
+<!--
+
+COPYRIGHT AND LICENSING NOTICE - January 20th, 2025
+
+This application, including its source code, is the intellectual property of Isaac Neumann ("Author"). 4th Street Agency, L.L.P. ("Licensee") is granted a non-exclusive, perpetual, royalty-free license to use, modify, and distribute this code as part of the website for Same Day Garage Door Services, L.L.C.. This license applies solely to the specific project for which this code was developed. The Author retains the right to use, modify, distribute, and license this code for other projects or clients.
+
+
+THIRD-PARTY LIBRARIES
+
+This application integrates the following third-party libraries, each governed by its respective license:
+
+- MapLibre GL JS (MIT License): https://github.com/maplibre/maplibre-gl-js/blob/main/LICENSE.txt
+- MapTiler Geocoding Control and Tiles (Refer to MapTiler Terms): https://www.maptiler.com/terms/
+- Turf.js (MIT License): https://github.com/Turfjs/turf/blob/master/LICENSE
+- Google Fonts: Lexend (SIL Open Font License) https://developers.google.com/fonts/faq
+
+The Author and Licensee must comply with these licenses when using, modifying, or redistributing the application.
+
+
+RESTRICTIONS
+
+The Licensee may not sublicense or sell the application as a standalone product.
+Any reuse or redistribution of the application must retain this copyright and licensing notice, along with the third-party licenses referenced above.
+
+DISCLAIMER
+
+The application is provided "as is," without warranty of any kind, express or implied. The Author is not liable for any damages arising from the use of this application.
+
+
+-->
