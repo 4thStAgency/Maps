@@ -231,7 +231,7 @@
 <body>
     <div id="map"></div>
     <script>
-        // MARK: - Global variables
+        // MARK: - Configurable constants
 
         // MapTiler public API key
         const API_KEY = 'TNtWDlBtkWMHsFhPqwDR';
@@ -242,269 +242,11 @@
         // The target URL for the "Get Service Now" button
         const getServiceTarget = 'https://samedaygaragedoorservices.com/get-service';
 
-        // Service area defined as a geojson polygon. Use a tool like geojson.studio if you need to edit this in the future.
-        const serviceArea = {
-          'type': 'Feature',
-          'geometry': {
-              'type': 'Polygon',
-              'coordinates': [
-              [
-                [
-                  -112.40370590948893,
-                  33.7431871957082
-                ],
-                [
-                  -112.49158057279631,
-                  33.6699399320877
-                ],
-                [
-                  -112.54466877532782,
-                  33.61549964159403
-                ],
-                [
-                  -112.58572198633023,
-                  33.56704184876229
-                ],
-                [
-                  -112.6287062119065,
-                  33.49509353649721
-                ],
-                [
-                  -112.64882002879735,
-                  33.45667354402134
-                ],
-                [
-                  -112.65610812564694,
-                  33.43348523201533
-                ],
-                [
-                  -112.6600531347413,
-                  33.409174463103085
-                ],
-                [
-                  -112.65748593154548,
-                  33.388825985994686
-                ],
-                [
-                  -112.65291287569838,
-                  33.372939758066536
-                ],
-                [
-                  -112.6424994293922,
-                  33.35673116424762
-                ],
-                [
-                  -112.62941151288378,
-                  33.34387092029327
-                ],
-                [
-                  -112.61201936749349,
-                  33.33268602652943
-                ],
-                [
-                  -112.59328998700032,
-                  33.324293121853756
-                ],
-                [
-                  -112.55239236948648,
-                  33.31293958818176
-                ],
-                [
-                  -112.48071648117005,
-                  33.30222116444273
-                ],
-                [
-                  -112.42276423132107,
-                  33.289590889176964
-                ],
-                [
-                  -112.37790411281011,
-                  33.27221416432242
-                ],
-                [
-                  -112.35667899530023,
-                  33.25666923760288
-                ],
-                [
-                  -112.3441297721763,
-                  33.2409726234592
-                ],
-                [
-                  -112.33828639570928,
-                  33.22317981435798
-                ],
-                [
-                  -112.33766131464888,
-                  33.20809753119336
-                ],
-                [
-                  -112.33913974393721,
-                  33.1911705747775
-                ],
-                [
-                  -112.34314293198395,
-                  33.1594962562738
-                ],
-                [
-                  -112.34956767500952,
-                  33.122740798330824
-                ],
-                [
-                  -112.35515249612268,
-                  33.0897694036958
-                ],
-                [
-                  -112.35704605015523,
-                  33.051373119170606
-                ],
-                [
-                  -112.3547288327128,
-                  33.02660802698735
-                ],
-                [
-                  -112.34852757269894,
-                  33.00617893006462
-                ],
-                [
-                  -112.33946872968303,
-                  32.982442780453454
-                ],
-                [
-                  -112.32652584409578,
-                  32.96195904915061
-                ],
-                [
-                  -112.27812954740854,
-                  32.9103823370167
-                ],
-                [
-                  -112.22202424337273,
-                  32.84151787417217
-                ],
-                [
-                  -112.18532829184828,
-                  32.81818490293915
-                ],
-                [
-                  -112.14920318884847,
-                  32.80942587603606
-                ],
-                [
-                  -112.06367007710794,
-                  32.80339878930373
-                ],
-                [
-                  -111.9557638698337,
-                  32.80019265682674
-                ],
-                [
-                  -111.71018583020606,
-                  32.8001188461965
-                ],
-                [
-                  -111.61326293887083,
-                  32.802208440279216
-                ],
-                [
-                  -111.54251428029798,
-                  32.81131399219511
-                ],
-                [
-                  -111.4801200024216,
-                  32.830306538937364
-                ],
-                [
-                  -111.41857359698314,
-                  32.862653033897544
-                ],
-                [
-                  -111.3647506500543,
-                  32.91080221406666
-                ],
-                [
-                  -111.3198647966374,
-                  32.97969840267841
-                ],
-                [
-                  -111.28718949843682,
-                  33.050092970196104
-                ],
-                [
-                  -111.25158219140437,
-                  33.136456949351185
-                ],
-                [
-                  -111.2369518066645,
-                  33.20346546435259
-                ],
-                [
-                  -111.2367810802284,
-                  33.28855401942204
-                ],
-                [
-                  -111.24752563102872,
-                  33.37652882710316
-                ],
-                [
-                  -111.27761037326945,
-                  33.47517015931794
-                ],
-                [
-                  -111.34852440855092,
-                  33.595181671274034
-                ],
-                [
-                  -111.44291221182588,
-                  33.69160047131423
-                ],
-                [
-                  -111.4902852884814,
-                  33.74347924204503
-                ],
-                [
-                  -111.54192632295485,
-                  33.781137783271205
-                ],
-                [
-                  -111.63432945983693,
-                  33.84719814284968
-                ],
-                [
-                  -111.75251951863937,
-                  33.89002081796082
-                ],
-                [
-                  -111.87500739776185,
-                  33.90964069687783
-                ],
-                [
-                  -112.00179309720475,
-                  33.914990789366
-                ],
-                [
-                  -112.0673792255276,
-                  33.90924081213406
-                ],
-                [
-                  -112.12857879664729,
-                  33.898939504399294
-                ],
-                [
-                  -112.19519501160867,
-                  33.870396425082674
-                ],
-                [
-                  -112.31805998462676,
-                  33.806323738590194
-                ],
-                [
-                  -112.40370590948893,
-                  33.7431871957082
-                ]
-              ]
-            ]
-          }
-      };
+
+        // MARK: - Global constants
+
+        // Service area data path (without extension - will try .geojson then .csv)
+        const serviceAreaPath = 'assets/map';
 
         // Color palette for UI elements
         const color = {
@@ -515,8 +257,8 @@
             blue: '#208cf5'
         };
 
-        // Map center (this doesnt matter since the resetView function will center the map on the service area)
-        const center = [-111.79, 33.425];
+        // Map center (center of the USA for initial load)
+        const center = [-98.5, 39.5];
 
 
         // Map initializer
@@ -524,7 +266,7 @@
             container: 'map',
             style: style + '?key=' + API_KEY,
             center: center,
-            zoom: 9.5,
+            zoom: 4,
             interactive: false,
         });
 
@@ -533,12 +275,259 @@
         document.querySelector('.maplibregl-ctrl-attrib').classList.remove('maplibregl-compact-show');
 
 
-        map.on('load', function() {
+        map.on('style.load', async function() {
             
+            // Helper function to parse WKT POLYGON to GeoJSON coordinates
+            function parseWKTPolygon(wkt) {
+                const match = wkt.match(/POLYGON\s*\(\(([^)]+)\)\)/i);
+                if (!match) return null;
+                const coordsString = match[1];
+                const coordinates = coordsString.split(',').map(pair => {
+                    const [lng, lat] = pair.trim().split(/\s+/).map(Number);
+                    return [lng, lat];
+                });
+                return coordinates;
+            }
+
+            // Helper function to parse WKT LINESTRING to coordinate array
+            function parseWKTLineString(wkt) {
+                const match = wkt.match(/LINESTRING\s*\(([^)]+)\)/i);
+                if (!match) return null;
+                const coordsString = match[1];
+                const coordinates = coordsString.split(',').map(pair => {
+                    const [lng, lat] = pair.trim().split(/\s+/).map(Number);
+                    return [lng, lat];
+                });
+                return coordinates;
+            }
+
+            // Helper function to parse CSV line and extract WKT and name
+            function parseCSVLine(line) {
+                const wktMatch = line.match(/"((?:POLYGON|LINESTRING)\s*\([^"]+\))"/i);
+                if (!wktMatch) return null;
+                
+                // Extract the name (second column after the WKT)
+                const afterWkt = line.substring(line.indexOf(wktMatch[0]) + wktMatch[0].length);
+                const nameMatch = afterWkt.match(/,([^,]*),/);
+                const name = nameMatch ? nameMatch[1].trim() : '';
+                
+                return { wkt: wktMatch[1], name };
+            }
+
+            // Helper function to check if two coordinates are equal (exact match)
+            function coordsEqual(a, b) {
+                return a[0] === b[0] && a[1] === b[1];
+            }
+
+            // Helper function to check if two coordinates are close (within tolerance)
+            function coordsClose(a, b, tolerance = 0.001) {
+                return Math.abs(a[0] - b[0]) < tolerance && Math.abs(a[1] - b[1]) < tolerance;
+            }
+
+            // Helper function to chain LineStrings by matching endpoints
+            function chainLineStrings(lineStrings) {
+                if (lineStrings.length === 0) return [];
+                if (lineStrings.length === 1) return lineStrings[0];
+
+                // Start with the first LineString
+                const result = [...lineStrings[0]];
+                const used = new Set([0]);
+
+                // Keep finding the next connecting LineString
+                while (used.size < lineStrings.length) {
+                    const currentEnd = result[result.length - 1];
+                    let foundNext = false;
+
+                    for (let i = 0; i < lineStrings.length; i++) {
+                        if (used.has(i)) continue;
+
+                        const line = lineStrings[i];
+                        const lineStart = line[0];
+                        const lineEnd = line[line.length - 1];
+
+                        // Check if this line's start connects to our current end
+                        if (coordsEqual(lineStart, currentEnd) || coordsClose(lineStart, currentEnd)) {
+                            // Add this line (skip first point if it matches)
+                            const startIdx = coordsClose(lineStart, currentEnd) ? 1 : 0;
+                            for (let j = startIdx; j < line.length; j++) {
+                                result.push(line[j]);
+                            }
+                            used.add(i);
+                            foundNext = true;
+                            break;
+                        }
+
+                        // Check if this line's end connects to our current end (reversed)
+                        if (coordsEqual(lineEnd, currentEnd) || coordsClose(lineEnd, currentEnd)) {
+                            // Add this line in reverse (skip last point which matches)
+                            for (let j = line.length - 2; j >= 0; j--) {
+                                result.push(line[j]);
+                            }
+                            used.add(i);
+                            foundNext = true;
+                            break;
+                        }
+                    }
+
+                    // If no connecting line found, find the closest one and add a gap segment
+                    if (!foundNext) {
+                        let closestIdx = -1;
+                        let closestDist = Infinity;
+                        let useReverse = false;
+
+                        for (let i = 0; i < lineStrings.length; i++) {
+                            if (used.has(i)) continue;
+
+                            const line = lineStrings[i];
+                            const lineStart = line[0];
+                            const lineEnd = line[line.length - 1];
+
+                            const distToStart = Math.hypot(lineStart[0] - currentEnd[0], lineStart[1] - currentEnd[1]);
+                            const distToEnd = Math.hypot(lineEnd[0] - currentEnd[0], lineEnd[1] - currentEnd[1]);
+
+                            if (distToStart < closestDist) {
+                                closestDist = distToStart;
+                                closestIdx = i;
+                                useReverse = false;
+                            }
+                            if (distToEnd < closestDist) {
+                                closestDist = distToEnd;
+                                closestIdx = i;
+                                useReverse = true;
+                            }
+                        }
+
+                        if (closestIdx >= 0) {
+                            const line = lineStrings[closestIdx];
+                            if (useReverse) {
+                                // Add in reverse
+                                for (let j = line.length - 1; j >= 0; j--) {
+                                    result.push(line[j]);
+                                }
+                            } else {
+                                // Add normally
+                                for (let j = 0; j < line.length; j++) {
+                                    result.push(line[j]);
+                                }
+                            }
+                            used.add(closestIdx);
+                        } else {
+                            break; // No more lines to add
+                        }
+                    }
+                }
+
+                return result;
+            }
+
+            // Helper function to parse Google MyMaps CSV export to GeoJSON
+            function parseCSVToGeoJSON(csvText) {
+                const lines = csvText.trim().split('\n');
+                if (lines.length < 2) return null;
+                
+                // First, try to find a polygon
+                for (let i = 1; i < lines.length; i++) {
+                    const parsed = parseCSVLine(lines[i]);
+                    if (parsed && parsed.wkt.toUpperCase().startsWith('POLYGON')) {
+                        const coordinates = parseWKTPolygon(parsed.wkt);
+                        if (coordinates) {
+                            return {
+                                type: 'Feature',
+                                properties: {},
+                                geometry: {
+                                    type: 'Polygon',
+                                    coordinates: [coordinates]
+                                }
+                            };
+                        }
+                    }
+                }
+
+                // Fallback: find LineStrings and combine them into a polygon
+                let firstLineStringName = null;
+                const lineStrings = [];
+
+                for (let i = 1; i < lines.length; i++) {
+                    const parsed = parseCSVLine(lines[i]);
+                    if (parsed && parsed.wkt.toUpperCase().startsWith('LINESTRING')) {
+                        // Use the first LineString's name as reference
+                        if (firstLineStringName === null) {
+                            firstLineStringName = parsed.name;
+                        }
+                        // Collect LineStrings with matching names (trimmed comparison)
+                        if (parsed.name === firstLineStringName) {
+                            const coords = parseWKTLineString(parsed.wkt);
+                            if (coords && coords.length > 0) {
+                                lineStrings.push(coords);
+                            }
+                        }
+                    }
+                }
+
+                if (lineStrings.length === 0) return null;
+
+                // Chain the LineStrings by matching endpoints (handles out-of-order lines)
+                const combinedCoords = chainLineStrings(lineStrings);
+
+                // Close the polygon if needed (connect last point to first point)
+                if (combinedCoords.length > 0) {
+                    const firstPoint = combinedCoords[0];
+                    const lastPoint = combinedCoords[combinedCoords.length - 1];
+                    if (!coordsEqual(firstPoint, lastPoint) && !coordsClose(firstPoint, lastPoint)) {
+                        combinedCoords.push([...firstPoint]);
+                    }
+                }
+
+                return {
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [combinedCoords]
+                    }
+                };
+            }
+
+            // Fetch the service area data (GeoJSON with CSV fallback)
+            let serviceArea;
+            try {
+                const response = await fetch(serviceAreaPath + '.geojson');
+                if (!response.ok) throw new Error('GeoJSON fetch failed');
+                const geojsonData = await response.json();
+                // Extract the first feature from the FeatureCollection
+                serviceArea = geojsonData.type === 'FeatureCollection' 
+                    ? geojsonData.features[0] 
+                    : geojsonData;
+            } catch (e) {
+                // Fallback to CSV
+                console.log('GeoJSON fetch failed, trying CSV fallback...');
+                try {
+                    const csvResponse = await fetch(serviceAreaPath + '.csv');
+                    if (!csvResponse.ok) throw new Error('CSV fetch failed');
+                    const csvText = await csvResponse.text();
+                    serviceArea = parseCSVToGeoJSON(csvText);
+                    if (!serviceArea) {
+                        throw new Error('Failed to parse CSV');
+                    }
+                } catch (csvError) {
+                    console.error('Failed to load service area from both GeoJSON and CSV:', csvError);
+                    return;
+                }
+            }
 
             map.addSource('serviceArea', {
                 'type': 'geojson',
                 'data': serviceArea
+            });
+
+            // Fit the map to the service area bounds (zoomed out initially)
+            const bounds = new maplibregl.LngLatBounds();
+            serviceArea.geometry.coordinates[0].forEach(function (coordinate) {
+                bounds.extend(coordinate);
+            });
+            map.fitBounds(bounds, {
+                padding: 240,
+                animate: false
             });
 
 
@@ -572,6 +561,13 @@
             }, "Road labels"); // Render underneath map labels
 
 
+            // Calculate the center of the service area for geocoder proximity
+            const serviceAreaCenter = turf.center(serviceArea).geometry.coordinates;
+            const proximity = [
+                Math.round(serviceAreaCenter[0] * 1000000) / 1000000,
+                Math.round(serviceAreaCenter[1] * 1000000) / 1000000
+            ];
+
             //Geocoder initializer
             const gc = new maplibreglMaptilerGeocoder.GeocodingControl({
                 apiKey: API_KEY,
@@ -580,7 +576,7 @@
                 noResultsMessage: 'No results found.',
                 placeholder: `See if you're in our service area`,
                 types: ['address'],
-                proximity: [-111.79, 33.425],
+                proximity: proximity,
                 zoom: 9.5,
                 showPlaceType: 'false',
                 showFullGeometry: false
@@ -624,8 +620,9 @@
                     if (isInside) {
                         // Within service area
                         const marker = document.querySelector('.maplibregl-marker');
+                        if (!marker) return;
                         const pin = marker.querySelector('svg');
-                        pin.remove();
+                        if (pin) pin.remove();
             
                         const message = document.createElement('div');
                         message.innerHTML = `
@@ -652,8 +649,9 @@
                     } else {
                         // Outside service area
                         const marker = document.querySelector('.maplibregl-marker');
+                        if (!marker) return;
                         const pin = marker.querySelector('svg');
-                        pin.remove();
+                        if (pin) pin.remove();
             
                         const message = document.createElement('div');
                         message.innerHTML = `
@@ -697,7 +695,7 @@
                         if (suggestion.innerHTML.includes('street.svg')) {
                             suggestion.remove();
                         }
-                        suggestionLine2s = suggestion.querySelectorAll('span span.line2');
+                        const suggestionLine2s = suggestion.querySelectorAll('span span.line2');
                         suggestionLine2s.forEach(function(suggestionLine2) {
                             if (suggestionLine2.innerHTML.includes('United States')) {
                                 suggestionLine2.innerHTML = suggestionLine2.innerHTML.replace(', United States', '');
@@ -725,7 +723,11 @@
                     padding: 80
                 });
             }
-            resetView();
+
+            // Ease in to the final view once the map has fully loaded
+            map.on('load', function() {
+                resetView();
+            });
 
 
         });
@@ -737,7 +739,7 @@
 
 <!--
 
-COPYRIGHT AND LICENSING NOTICE - January 20th, 2025
+COPYRIGHT AND LICENSING NOTICE - January 8th, 2026
 
 This application, including its source code, is the intellectual property of Isaac Neumann ("Author"). 4th Street Agency, L.L.P. ("Licensee") is granted a non-exclusive, perpetual, royalty-free license to use, modify, and distribute this code as part of the website for Same Day Garage Door Services, L.L.C.. This license applies solely to the specific project for which this code was developed. The Author retains the right to use, modify, distribute, and license this code for other projects or clients.
 

@@ -1,4 +1,4 @@
-COPYRIGHT AND LICENSING NOTICE - January 20th, 2025
+COPYRIGHT AND LICENSING NOTICE - January 8th, 2026
 
 This application, including its source code, is the intellectual property of Isaac Neumann ("Author"). 4th Street Agency, L.L.P. ("Licensee") is granted a non-exclusive, perpetual, royalty-free license to use, modify, and distribute this code as part of the website for Same Day Garage Door Services, L.L.C.. This license applies solely to the specific project for which this code was developed. The Author retains the right to use, modify, distribute, and license this code for other projects or clients.
 
